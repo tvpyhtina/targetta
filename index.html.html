@@ -660,7 +660,7 @@
   </div>
 
   <div class="feed target-hover">
-    <div class="feed-badge">ON TARGET</div>
+    <div class="feed-badge">ЦЕЛЬ ПОРАЖЕНА</div>
     <div class="feed-top">
       <div class="feed-avatar"></div>
       <div>
@@ -778,14 +778,14 @@
       <p>«За два месяца заявки с рекламы подешевели почти вдвое. Команда честно показывает, что сработало, а что нет».</p>
       <div class="who">
         <div class="who-avatar" style="background:linear-gradient(135deg,#FF3D68,#FFC93C)"></div>
-        <div><div class="who-name">Марина К.</div><div class="who-role">сеть кофеен «Surf»</div></div>
+        <div><div class="who-name">Марина К.</div><div class="who-role">кофейня «Чашка Кофею»</div></div>
       </div>
     </div>
     <div class="testimonial target-hover">
-      <p>«Наконец соцсети перестали быть головной болью — контент выходит по плану, а новые посетители приходят стабильно».</p>
+      <p>«Наконец соцсети перестали быть головной болью — контент выходит по плану, а новые гости идут стабильно каждую неделю».</p>
       <div class="who">
         <div class="who-avatar" style="background:linear-gradient(135deg,#3D5AFE,#C6FF3D)"></div>
-        <div><div class="who-name">Павел П.</div><div class="who-role">сеть баров «Hop Gun»</div></div>
+        <div><div class="who-name">Павел П.</div><div class="who-role">сеть баров "Hop Gun"</div></div>
       </div>
     </div>
     <div class="testimonial target-hover">
@@ -879,8 +879,8 @@
 </section>
 
 <footer>
-  <div>© 2026 Агентство «ЦЕЛЬ». Все права защищены.</div>
-  <div>hello@tsel.agency · Telegram @tsel_agency</div>
+  <div>© 2026 Агентство «TARGETTA». Все права защищены.</div>
+  <div>hello@targetta.agency · Telegram @targetta_agency</div>
 </footer>
 
 <script>
@@ -905,13 +905,47 @@
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-  // demo form
+  // отправка формы в Telegram
+  const TG_BOT_TOKEN = '8310255902:AAFfna9VAMCR0cRWJ-JDjfPVI-jtTdktaHs';
+  const TG_CHAT_ID = '467440109';
+
   const form = document.getElementById('leadForm');
   const success = document.getElementById('formSuccess');
-  form.addEventListener('submit', (e) => {
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    form.style.display = 'none';
-    success.classList.add('show');
+
+    const submitBtn = form.querySelector('.form-submit');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Отправляем...';
+    submitBtn.disabled = true;
+
+    const name = document.getElementById('name').value.trim();
+    const contact = document.getElementById('contact-input').value.trim();
+    const site = document.getElementById('site').value.trim();
+
+    const text =
+      `🎯 Новая заявка с сайта TARGETTA\n\n` +
+      `Имя: ${name}\n` +
+      `Контакт: ${contact}\n` +
+      (site ? `Сайт/соцсеть: ${site}\n` : '');
+
+    try {
+      const res = await fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: TG_CHAT_ID, text })
+      });
+
+      if (!res.ok) throw new Error('Telegram API error');
+
+      form.style.display = 'none';
+      success.classList.add('show');
+    } catch (err) {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      alert('Не удалось отправить заявку. Попробуйте ещё раз или напишите нам напрямую.');
+    }
   });
 </script>
 
